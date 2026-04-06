@@ -1,0 +1,7 @@
+discord
+pymongo
+dotenv
+colour
+motor
+jishaku
+asyncio
