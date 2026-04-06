@@ -5,3 +5,4 @@ colour
 motor
 jishaku
 asyncio
+colorama
