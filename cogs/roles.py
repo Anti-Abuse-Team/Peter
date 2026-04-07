@@ -8,7 +8,7 @@ from utils.variables import admin
 from utils.functions import parse_color
 import pymongo
 from pymongo.errors import PyMongoError
-from view.Roles.RoleSelection import RoleSelectView
+from views.Roles.RoleSelection import RoleSelectView
 
 load_dotenv()
 mongo = MongoClient(os.getenv("MONGODB_URL"))
