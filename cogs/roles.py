@@ -13,6 +13,59 @@ mongo = MongoClient(os.getenv("MONGODB_URL"))
 main_db = mongo["AAT"]
 roles_db = main_db["roles"]
 
+class RoleSelect(discord.ui.Select):
+    def __init__(self, user_roles, ctx):
+        self.ctx = ctx
+        options = []
+        for i, role_id in enumerate(user_roles):
+            role = ctx.guild.get_role(role_id)
+            if role:  # Only show roles that still exist
+                role_name = role.name
+                options.append(
+                    discord.SelectOption(label=f"Role {i+1}: {role_name}", value=str(role_id))
+                )
+        
+        if not options:
+            options.append(discord.SelectOption(label="No valid roles", value="0", disabled=True))
+        
+        super().__init__(placeholder="Select a role to configure", options=options, min_values=1, max_values=1)
+
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.ctx.author.id:
+            await interaction.response.send_message("You cannot use this menu!", ephemeral=True)
+            return
+        
+        self.view.selected_role_id = int(self.values[0])
+        await interaction.response.defer()
+        self.view.stop()
+
+class RoleSelectView(discord.ui.View):
+    def __init__(self, user_roles, ctx):
+        super().__init__(timeout=30)
+        self.user_roles = user_roles
+        self.ctx = ctx
+        self.selected_role_id = None
+        self.add_item(RoleSelect(user_roles, ctx))
+
+def get_valid_roles(user_data, ctx):
+    """Filter out deleted roles from user's role list"""
+    if not user_data or not user_data.get("roles"):
+        return None
+    
+    valid_roles = []
+    for role_id in user_data.get("roles", []):
+        if ctx.guild.get_role(role_id):
+            valid_roles.append(role_id)
+    
+    # Update MongoDB to remove deleted roles
+    if len(valid_roles) != len(user_data.get("roles", [])):
+        if valid_roles:
+            roles_db.update_one({"user_id": ctx.author.id}, {"$set": {"roles": valid_roles}})
+        else:
+            roles_db.delete_one({"user_id": ctx.author.id})
+    
+    return valid_roles if valid_roles else None
+
 class Roles(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -25,11 +78,11 @@ class Roles(commands.Cog):
     async def register(self, ctx: commands.Context, role: discord.Role, member: discord.Member):
         if any(r.id in admin for r in ctx.author.roles):
             try:
-                roles_db.insert_one({"user_id": member.id, "role_id": role.id})
+                roles_db.insert_one({"user_id": member.id, "roles": [role.id]})
                 embed = discord.Embed(title="<:Check:1490727471761457335> Registered", description=f"{role.mention} has been registered for {member.mention}", color=discord.Color.green())
                 await ctx.send(embed=embed)
             except PyMongoError as exc:
-                embed = discord.Embed(title="<:Cross:1490727525356278064> Failed to Register", description=f"I have recieved an error. (`{exec}`)", color=discord.Color.red())
+                embed = discord.Embed(title="<:Cross:1490727525356278064> Failed to Register", description=f"I have recieved an error. (`{exc}`)", color=discord.Color.red())
                 await ctx.send(embed=embed)
         else:
             embed = discord.Embed(title="<:Cross:1490727525356278064> Lack of Permissions", description=f"You do not have permisson to execute this command.", color=discord.Color.red())
@@ -41,78 +94,149 @@ class Roles(commands.Cog):
             embed = discord.Embed(title="<:Cross:1490727525356278064> Not Allowed", description=f"You are not allowed to create a custom role as you are not a server booster.", color=discord.Color.red())
             await ctx.send(embed=embed, ephemeral=True) 
             return
+        
         info = roles_db.find_one({"user_id": ctx.author.id})
-        if info:
-            embed = discord.Embed(title="<:Cross:1490727525356278064> Role Limit", description=f"You are only allowed to have 1 custom role at this time.", color=discord.Color.red())
+        valid_roles = get_valid_roles(info, ctx)
+        
+        if valid_roles and len(valid_roles) >= 2:
+            embed = discord.Embed(title="<:Cross:1490727525356278064> Role Limit", description=f"You are only allowed to have 2 custom roles at this time.", color=discord.Color.red())
             await ctx.send(embed=embed, ephemeral=True)
             return
         
         role = await ctx.guild.create_role(name=name)
-        positions = {role: 154}
-        await ctx.guild.edit_role_positions(positions)
+        
+        # Try to position the role, but don't crash if it fails
+        try:
+            positions = {role: 154}
+            await ctx.guild.edit_role_positions(positions)
+        except discord.errors.HTTPException as e:
+            print(f"Warning: Could not reposition role (may need higher permissions): {e}")
+        
         await ctx.author.add_roles(role)
-        roles_db.insert_one({"user_id": ctx.author.id, "role_id": role.id})
+        
+        if valid_roles:
+            # User already has valid roles, add to array
+            roles_db.update_one({"user_id": ctx.author.id}, {"$push": {"roles": role.id}})
+        else:
+            # First role for this user
+            roles_db.insert_one({"user_id": ctx.author.id, "roles": [role.id]})
+        
         embed = discord.Embed(title="<:Check:1490727471761457335> Role Created", description=f"I have succesfully created {role.mention}", color=discord.Color.green())
         await ctx.send(embed=embed, ephemeral=True)
-
 
     @custom.command(name="color", description="Modifys the color of a custom role")          
     async def color(self, ctx: commands.Context, color: str):
         info = roles_db.find_one({"user_id": ctx.author.id})
-        if info:
-            try:
-                role_color =  parse_color(color)
-            except:
-                await ctx.send("Invalid hex code.")
-                return
-            role_id = int(info["role_id"])
-            role = ctx.guild.get_role(role_id)
-            if role is None:
-                await ctx.send('couldnt fetch role')
-                return
-            await role.edit(color=role_color)
-            embed = discord.Embed(title="<:Check:1490727471761457335> Color Changed", description=f"Succesfully changed role color to `{color}`", color=discord.Color.green())
-            await ctx.send(embed=embed, ephemeral=True)
-        else:
+        valid_roles = get_valid_roles(info, ctx)
+        
+        if not valid_roles:
             embed = discord.Embed(title="<:Cross:1490727525356278064> No Role", description=f"You do not currently have any custom role registered.", color=discord.Color.red())
             await ctx.send(embed=embed, ephemeral=True)
+            return
+        
+        # If user has multiple roles, show dropdown
+        if len(valid_roles) > 1:
+            view = RoleSelectView(valid_roles, ctx)
+            msg = await ctx.send("Select which role you want to modify:", view=view, ephemeral=True)
+            try:
+                await view.wait()
+            except:
+                pass
+            selected_role_id = view.selected_role_id
+            if not selected_role_id:
+                await ctx.send("No role selected.", ephemeral=True)
+                return
+        else:
+            selected_role_id = valid_roles[0]
+        
+        try:
+            role_color = parse_color(color)
+        except:
+            await ctx.send("Invalid hex code.")
+            return
+        
+        role = ctx.guild.get_role(selected_role_id)
+        if role is None:
+            await ctx.send('couldnt fetch role')
+            return
+        
+        await role.edit(color=role_color)
+        embed = discord.Embed(title="<:Check:1490727471761457335> Color Changed", description=f"Succesfully changed role color to `{color}`", color=discord.Color.green())
+        await ctx.send(embed=embed, ephemeral=True)
 
     @custom.command(name="name", description="Modifys the name of a custom role")          
     async def name(self, ctx: commands.Context, *, name: str):
         info = roles_db.find_one({"user_id": ctx.author.id})
-        if info:
-            role_id = int(info["role_id"])
-            role = ctx.guild.get_role(role_id)
-            if role is None:
-                await ctx.send('couldnt fetch role')   
-                return
-            await role.edit(name=name)
-            embed = discord.Embed(title="<:Check:1490727471761457335> Name Changed", description=f"Succesfully changed role name to `{name}`", color=discord.Color.green())
-            await ctx.send(embed=embed, ephemeral=True)     
-        else:
+        valid_roles = get_valid_roles(info, ctx)
+        
+        if not valid_roles:
             embed = discord.Embed(title="<:Cross:1490727525356278064> No Role Found", description=f"You do not currently have any custom role registered.", color=discord.Color.red())
             await ctx.send(embed=embed, ephemeral=True)
-    
+            return
+        
+        # If user has multiple roles, show dropdown
+        if len(valid_roles) > 1:
+            view = RoleSelectView(valid_roles, ctx)
+            msg = await ctx.send("Select which role you want to modify:", view=view, ephemeral=True)
+            try:
+                await view.wait()
+            except:
+                pass
+            selected_role_id = view.selected_role_id
+            if not selected_role_id:
+                await ctx.send("No role selected.", ephemeral=True)
+                return
+        else:
+            selected_role_id = valid_roles[0]
+        
+        role = ctx.guild.get_role(selected_role_id)
+        if role is None:
+            await ctx.send('couldnt fetch role')   
+            return
+        
+        await role.edit(name=name)
+        embed = discord.Embed(title="<:Check:1490727471761457335> Name Changed", description=f"Succesfully changed role name to `{name}`", color=discord.Color.green())
+        await ctx.send(embed=embed, ephemeral=True)     
+
     @custom.command(name="icon", description="Modifys the icon of a custom role")
     async def icon(self, ctx: commands.Context, icon: discord.Attachment):
         info = roles_db.find_one({"user_id": ctx.author.id})
-        if info:
-            role_id = int(info["role_id"])
-            role = ctx.guild.get_role(role_id)
-            if role is None:
-                await ctx.send('couldnt fetch role')   
-                return            
-            image_bytes = await icon.read()
-            if not icon.content_type or not icon.content_type.startswith("image/"):
-                await ctx.send("❌ Please upload a valid image file.", ephemeral=True)
-                return
-            await role.edit(display_icon=image_bytes)
-            embed = discord.Embed(title="<:Check:1490727471761457335> Icon Changed", description=f"Succesfully changed role icon.", color=discord.Color.green())
-            embed.set_thumbnail(url=icon.url)
-            await ctx.send(embed=embed, ephemeral=True)     
-        else:
+        valid_roles = get_valid_roles(info, ctx)
+        
+        if not valid_roles:
             embed = discord.Embed(title="<:Cross:1490727525356278064> No Role Found", description=f"You do not currently have any custom role registered.", color=discord.Color.red())
-            await ctx.send(embed=embed, ephemeral=True)                     
+            await ctx.send(embed=embed, ephemeral=True)
+            return
+        
+        # If user has multiple roles, show dropdown
+        if len(valid_roles) > 1:
+            view = RoleSelectView(valid_roles, ctx)
+            msg = await ctx.send("Select which role you want to modify:", view=view, ephemeral=True)
+            try:
+                await view.wait()
+            except:
+                pass
+            selected_role_id = view.selected_role_id
+            if not selected_role_id:
+                await ctx.send("No role selected.", ephemeral=True)
+                return
+        else:
+            selected_role_id = valid_roles[0]
+        
+        role = ctx.guild.get_role(selected_role_id)
+        if role is None:
+            await ctx.send('couldnt fetch role')   
+            return            
+        
+        image_bytes = await icon.read()
+        if not icon.content_type or not icon.content_type.startswith("image/"):
+            await ctx.send("❌ Please upload a valid image file.", ephemeral=True)
+            return
+        
+        await role.edit(display_icon=image_bytes)
+        embed = discord.Embed(title="<:Check:1490727471761457335> Icon Changed", description=f"Succesfully changed role icon.", color=discord.Color.green())
+        embed.set_thumbnail(url=icon.url)
+        await ctx.send(embed=embed, ephemeral=True)
 
 
 
