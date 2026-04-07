@@ -1,3 +1,4 @@
+# roles.py
 import discord
 from discord.ext import commands
 from pymongo import MongoClient
@@ -7,45 +8,12 @@ from utils.variables import admin
 from utils.functions import parse_color
 import pymongo
 from pymongo.errors import PyMongoError
+from view.Roles.RoleSelection import RoleSelectView
 
 load_dotenv()
 mongo = MongoClient(os.getenv("MONGODB_URL"))
 main_db = mongo["AAT"]
 roles_db = main_db["roles"]
-
-class RoleSelect(discord.ui.Select):
-    def __init__(self, user_roles, ctx):
-        self.ctx = ctx
-        options = []
-        for i, role_id in enumerate(user_roles):
-            role = ctx.guild.get_role(role_id)
-            if role:  # Only show roles that still exist
-                role_name = role.name
-                options.append(
-                    discord.SelectOption(label=f"Role {i+1}: {role_name}", value=str(role_id))
-                )
-        
-        if not options:
-            options.append(discord.SelectOption(label="No valid roles", value="0", disabled=True))
-        
-        super().__init__(placeholder="Select a role to configure", options=options, min_values=1, max_values=1)
-
-    async def callback(self, interaction: discord.Interaction):
-        if interaction.user.id != self.ctx.author.id:
-            await interaction.response.send_message("You cannot use this menu!", ephemeral=True)
-            return
-        
-        self.view.selected_role_id = int(self.values[0])
-        await interaction.response.defer()
-        self.view.stop()
-
-class RoleSelectView(discord.ui.View):
-    def __init__(self, user_roles, ctx):
-        super().__init__(timeout=30)
-        self.user_roles = user_roles
-        self.ctx = ctx
-        self.selected_role_id = None
-        self.add_item(RoleSelect(user_roles, ctx))
 
 def get_valid_roles(user_data, ctx):
     """Filter out deleted roles from user's role list"""
@@ -237,8 +205,6 @@ class Roles(commands.Cog):
         embed = discord.Embed(title="<:Check:1490727471761457335> Icon Changed", description=f"Succesfully changed role icon.", color=discord.Color.green())
         embed.set_thumbnail(url=icon.url)
         await ctx.send(embed=embed, ephemeral=True)
-
-
 
 async def setup(bot):
     await bot.add_cog(Roles(bot))
