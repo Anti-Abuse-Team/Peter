@@ -12,3 +12,13 @@ def parse_color(color_str: str) -> discord.Color:
         return discord.Color.from_rgb(r, g, b)
     except Exception:
         raise ValueError("Invalid color format")
+
+import random
+import string
+
+def gen_unique_key(db, length=10):
+    """Generate unique key not in db.keys collection."""
+    while True:
+        key = ''.join(random.choices(string.ascii_letters + string.digits, k=length))
+        if not db.find_one({"key": key}):
+            return key

@@ -8,11 +8,22 @@ from dotenv import load_dotenv
 import jishaku
 
 
-load_dotenv()
+# Explicitly load .env from project root (CWD) to avoid path ambiguity
+ENV_PATH = os.path.join(os.getcwd(), ".env")
+load_dotenv(dotenv_path=ENV_PATH, override=True)
+
+TOKEN = (os.getenv("TOKEN") or "").strip()
+PREFIX = os.getenv("PREFIX", "!")
+
+if not TOKEN:
+    raise RuntimeError(
+        "Missing TOKEN environment variable. Add TOKEN=your_discord_bot_token to your .env file."
+    )
+
 intents = discord.Intents.default()
 intents.message_content = True
 
-client = commands.Bot(command_prefix=os.getenv("PREFIX"), intents=intents)
+client = commands.Bot(command_prefix=PREFIX, intents=intents)
 
 
 @client.event
@@ -35,7 +46,7 @@ async def load_cogs():
 async def main():
     async with client:
         await load_cogs()
-        await client.start(os.getenv("TOKEN"))
+        await client.start(TOKEN)
 
 
 if __name__ == "__main__":

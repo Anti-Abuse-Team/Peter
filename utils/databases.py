@@ -11,6 +11,7 @@ load_dotenv()
 mongodb = MongoClient(os.getenv("MONGODB_URL"))
 db = mongodb["AAT"]
 roles_db = db["roles"]
+keys_db = db["keys"]
 
 client = motor.motor_asyncio.AsyncIOMotorClient(
     os.getenv("MONGODB_URL"),
@@ -24,4 +25,4 @@ client = motor.motor_asyncio.AsyncIOMotorClient(
 )
 
 db = client['AAT']
-roles = client.roles
+roles = db["roles"]

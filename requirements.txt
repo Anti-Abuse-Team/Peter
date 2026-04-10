@@ -4,3 +4,6 @@ colorama>=0.4.6
 jishaku>=2.5.2
 pymongo>=4.7.3
 motor>=3.4.0
+openai>=1.0.0
+cohere>=5.8.1
+colour>=0.1.5
