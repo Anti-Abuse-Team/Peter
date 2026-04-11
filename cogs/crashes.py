@@ -89,7 +89,7 @@ class Crashes(commands.Cog):
             log = make_container(
                 ui.TextDisplay("### <:Alert:1492637717798981702> Crash"),
                 ui.Separator(),
-                ui.TextDisplay(f"The command `/crash issue`has been utilized;\nHandler: {ctx.author.name}\nCrash: `{role.name}`\nIssued to: {user.name}"),
+                ui.TextDisplay(f"Command: `/crash issue`\nHandler: {ctx.author.name}\nCrash: `{role.name}`\nIssued to: {user.name}"),
                 accent_color=0xF9A825
             )
 
@@ -111,7 +111,7 @@ class Crashes(commands.Cog):
             log = make_container(
                 ui.TextDisplay("### <:Alert:1492637717798981702> Crash"),
                 ui.Separator(),
-                ui.TextDisplay(f"The command `/crash issue`has been utilized;\nHandler: {ctx.author.name}\nCrash: `{role.name}`\nIssued to: {user.name}"),
+                ui.TextDisplay(f"Command: `/crash issue`\nHandler: {ctx.author.name}\nCrash: `{role.name}`\nIssued to: {user.name}"),
                 accent_color=0xF9A825
             )
 
