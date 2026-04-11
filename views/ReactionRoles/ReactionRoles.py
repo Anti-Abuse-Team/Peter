@@ -4,11 +4,11 @@ from discord import ui
 class PingDropdown(ui.Select):
     def __init__(self):
         options = [
-            discord.SelectOption(label="Announcement Ping", value=1374412126705422347, emoji="<:Announcements:1492295845138141246>"),
-            discord.SelectOption(label="Dead Chat Ping", value=1291869585867276308, emoji="<:DeadChat:1492297225647161496>"),
-            discord.SelectOption(label="Question of the Day Ping", value=1293767506691096636, emoji="<:Question:1492297377883885849>"),
-            discord.SelectOption(label="Giveaway Ping", value=1355230077503410288, emoji="<:Giveaway:1492297810882855144>"),
-            discord.SelectOption(label="Witch Hunter Ping", value=1322890862551629897, emoji="<:WitchHunter:1492297802586263582>")
+            discord.SelectOption(label="Announcement Ping", value=1374412126705422347, emoji="<:Announcement:1492362977410547812>"),
+            discord.SelectOption(label="Dead Chat Ping", value=1291869585867276308, emoji="<:Dead:1492362975170924615>"),
+            discord.SelectOption(label="Question of the Day Ping", value=1293767506691096636, emoji="<:Question:1492362973023309835>"),
+            discord.SelectOption(label="Giveaway Ping", value=1355230077503410288, emoji="<:Giveaway:1492362970959712357>"),
+            discord.SelectOption(label="Witch Hunter Ping", value=1322890862551629897, emoji="<:Witch:1492362969177133167>")
         ]
 
         super().__init__(
@@ -42,7 +42,7 @@ class PingReactionRoles(ui.LayoutView):
         container = ui.Container(
             ui.TextDisplay("### Ping Roles"),
             ui.Separator(),
-            ui.TextDisplay("These are the following roles you can get pings for;\n> <:Announcements:1492295845138141246>  |  Dead Chat Ping\n> <:DeadChat:1492297225647161496>  | Question of The Day Ping\n> <:Question:1492297377883885849>  |  Giveaway Ping\n> <:Giveaway:1492297810882855144>  |  Announcements Ping\n> <:WitchHunter:1492297802586263582>  |  Witch Hunter Ping\n"),
+            ui.TextDisplay("These are the following roles you can get pings for;\n> <:Announcement:1492362977410547812>  |  Dead Chat Ping\n> <:Dead:1492362975170924615>  | Question of The Day Ping\n> <:Question:1492362973023309835>  |  Giveaway Ping\n> <:Giveaway:1492362970959712357>  |  Announcements Ping\n> <:Witch:1492362969177133167>  |  Witch Hunter Ping\n"),
             ui.Separator()
         )
 
