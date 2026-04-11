@@ -5,7 +5,7 @@ from pymongo import MongoClient
 import os
 from dotenv import load_dotenv
 from utils.variables import admin
-from utils.functions import parse_color
+from utils.functions import parse_color, get_valid_roles
 import pymongo
 from pymongo.errors import PyMongoError
 from views.Roles.RoleSelection import RoleSelectView
@@ -14,25 +14,6 @@ load_dotenv()
 mongo = MongoClient(os.getenv("MONGODB_URL"))
 main_db = mongo["AAT"]
 roles_db = main_db["roles"]
-
-def get_valid_roles(user_data, ctx):
-    """Filter out deleted roles from user's role list"""
-    if not user_data or not user_data.get("roles"):
-        return None
-    
-    valid_roles = []
-    for role_id in user_data.get("roles", []):
-        if ctx.guild.get_role(role_id):
-            valid_roles.append(role_id)
-    
-    # Update MongoDB to remove deleted roles
-    if len(valid_roles) != len(user_data.get("roles", [])):
-        if valid_roles:
-            roles_db.update_one({"user_id": ctx.author.id}, {"$set": {"roles": valid_roles}})
-        else:
-            roles_db.delete_one({"user_id": ctx.author.id})
-    
-    return valid_roles if valid_roles else None
 
 class Roles(commands.Cog):
     def __init__(self, bot):
@@ -44,7 +25,7 @@ class Roles(commands.Cog):
 
     @custom.command(name="register", description="Registers a custom role to a user")
     async def register(self, ctx: commands.Context, role: discord.Role, member: discord.Member):
-        if any(r.id in admin for r in ctx.author.roles):
+        if any(r.id in admin for r in ctx.author.roles) or ctx.author.guild_permissions.administrator:
             try:
                 roles_db.insert_one({"user_id": member.id, "roles": [role.id]})
                 embed = discord.Embed(title="<:Check:1490727471761457335> Registered", description=f"{role.mention} has been registered for {member.mention}", color=discord.Color.green())
