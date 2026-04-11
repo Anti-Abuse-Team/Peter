@@ -19,9 +19,9 @@ client = commands.Bot(command_prefix=os.getenv("PREFIX"), intents=intents)
 async def on_ready():
     await client.load_extension("jishaku")
     await client.change_presence(activity=discord.Game("[FREE ADMIN]"))
-    print(f"Logged in as {client.user}")
+    print(f"{Fore.YELLOW}[!]{Fore.RESET} Logged in as {client.user}")
     synced = await client.tree.sync()
-    print(f"Synced {len(synced)} commands globally.")
+    print(f"{Fore.YELLOW}[!]{Fore.RESET} Synced {len(synced)} commands globally.")
 
 async def load_cogs():
     for filename in os.listdir("./cogs"):
