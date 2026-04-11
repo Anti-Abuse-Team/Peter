@@ -24,7 +24,7 @@ class PingDropdown(ui.Select):
 
         role = interaction.guild.get_role(int(id))
         if role is None:
-            await interaction.response.send_message("Failed to locate role.", ephemeral=True)
+            await interaction.followup.send("Failed to locate role.", ephemeral=True)
             return
 
         if role in interaction.user.roles:
@@ -81,7 +81,7 @@ class ColorDropdown(ui.Select):
 
         role = interaction.guild.get_role(int(id))
         if role is None:
-            await interaction.response.send_message("Failed to locate role.", ephemeral=True)
+            await interaction.followup.send("Failed to locate role.", ephemeral=True)
             return
 
         if role in interaction.user.roles:
@@ -100,7 +100,7 @@ class ColorReactionRoles(ui.LayoutView):
         container = ui.Container(
             ui.TextDisplay("### Color Roles"),
             ui.Separator(),
-            ui.TextDisplay("These are the following roles you can have for colors;\n> <:Red:1492362983035109466>  |  Red\n> <:Orange:1492365963507531836>  |  Orange\n> <:Yellow:1492362987162308638>  | Yellow\n> <:Green:1492365965294436512>  |  Green\n> <:Cyan:1492365966699397302>  |  Cyan>\n> <:Blue:1492365968301621398>  |  Blue\n> <:Purple:1492365937855434924>  |  Purple\n> <:Pink:1492365939671437415>  |  Pink\n> <:Brown:1492365944889147403>  |  Brown\n> <:White:1492365941323989172>  |  White\n> <:Black:1492365942833942722>  |  Black"),
+            ui.TextDisplay("These are the following roles you can have for colors;\n> <:Red:1492362983035109466>  |  Red\n> <:Orange:1492365963507531836>  |  Orange\n> <:Yellow:1492362987162308638>  | Yellow\n> <:Green:1492365965294436512>  |  Green\n> <:Cyan:1492365966699397302>  |  Cyan\n> <:Blue:1492365968301621398>  |  Blue\n> <:Purple:1492365937855434924>  |  Purple\n> <:Pink:1492365939671437415>  |  Pink\n> <:Brown:1492365944889147403>  |  Brown\n> <:White:1492365941323989172>  |  White\n> <:Black:1492365942833942722>  |  Black"),
             ui.Separator()
         )
 
@@ -131,7 +131,7 @@ class LeaveDropdown(ui.Select):
 
         role = interaction.guild.get_role(int(id))
         if role is None:
-            await interaction.response.send_message("Failed to locate role.", ephemeral=True)
+            await interaction.followup.send("Failed to locate role.", ephemeral=True)
             return
 
         if role in interaction.user.roles:
