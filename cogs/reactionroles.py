@@ -16,6 +16,7 @@ class ReactionRoles(commands.Cog):
     async def register(self, ctx: commands.Context):    
         if any(r.id in admin for r in ctx.author.roles) or ctx.author.guild_permissions.administrator:
             try:
+                view = PingReactionRoles()
                 await ctx.send(view=view)
                 view = LeaveReactionRoles()
                 await ctx.send(view=view)
