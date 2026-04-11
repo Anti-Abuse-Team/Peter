@@ -84,6 +84,16 @@ class Crashes(commands.Cog):
             )
             await ctx.send(view=view, ephemeral=True)
 
+            log_channel = ctx.guild.get_channel(1492638575928414279)
+
+            log = make_container(
+                ui.TextDisplay("### <:Alert:1492637717798981702> Crash"),
+                ui.Separator(),
+                ui.TextDisplay(f"The command `/crash issue`has been utilized;\nHandler: {ctx.author.name}\nCrash: `{role.name}`\nIssued to: {user.name}"),
+                accent_color=0xF9A825
+            )
+
+            await log_channel.send(view=log)
         else:
             role_id = int(roles[0])
             role = ctx.guild.get_role(role_id)
@@ -95,6 +105,17 @@ class Crashes(commands.Cog):
                 accent_color=discord.Color.green()
             )
             await ctx.send(view=view, ephemeral=True)
+        
+            log_channel = ctx.guild.get_channel(1492638575928414279)
+
+            log = make_container(
+                ui.TextDisplay("### <:Alert:1492637717798981702> Crash"),
+                ui.Separator(),
+                ui.TextDisplay(f"The command `/crash issue`has been utilized;\nHandler: {ctx.author.name}\nCrash: `{role.name}`\nIssued to: {user.name}"),
+                accent_color=0xF9A825
+            )
+
+            await log_channel.send(view=log)
     
 async def setup(bot):
     await bot.add_cog(Crashes(bot))
