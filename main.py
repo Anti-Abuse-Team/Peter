@@ -15,6 +15,11 @@ load_dotenv(dotenv_path=ENV_PATH, override=True)
 TOKEN = (os.getenv("TOKEN") or "").strip()
 PREFIX = os.getenv("PREFIX", "!")
 
+# Safe startup diagnostics (no sensitive token contents logged)
+print(f"[startup] .env path: {ENV_PATH}")
+print(f"[startup] TOKEN loaded: {bool(TOKEN)} | TOKEN length: {len(TOKEN)}")
+print(f"[startup] PREFIX: {PREFIX}")
+
 if not TOKEN:
     raise RuntimeError(
         "Missing TOKEN environment variable. Add TOKEN=your_discord_bot_token to your .env file."
