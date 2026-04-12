@@ -37,7 +37,7 @@ class PingDropdown(ui.Select):
 
 class PingReactionRoles(ui.LayoutView):
     def __init__(self):
-        super().__init__()
+        super().__init__(timeout=None)
 
         container = ui.Container(
             ui.TextDisplay("### Ping Roles"),
@@ -95,7 +95,7 @@ class ColorDropdown(ui.Select):
 
 class ColorReactionRoles(ui.LayoutView):
     def __init__(self):
-        super().__init__()
+        super().__init__(timeout=None)
 
         container = ui.Container(
             ui.TextDisplay("### Color Roles"),
@@ -143,7 +143,7 @@ class LeaveDropdown(ui.Select):
 
 class LeaveReactionRoles(ui.LayoutView):
     def __init__(self):
-        super().__init__()
+        super().__init__(timeout=None)
 
         container = ui.Container(
             ui.TextDisplay("### Leave Roles"),

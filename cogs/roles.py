@@ -74,7 +74,7 @@ class Roles(commands.Cog):
         await ctx.send(embed=embed, ephemeral=True)
 
     @custom.command(name="color", description="Modifys the color of a custom role")          
-    async def color(self, ctx: commands.Context, color: str):
+    async def color(self, ctx: commands.Context, color1: str, color2: str=None):
         info = roles_db.find_one({"user_id": ctx.author.id})
         valid_roles = get_valid_roles(info, ctx)
         
@@ -82,8 +82,7 @@ class Roles(commands.Cog):
             embed = discord.Embed(title="<:Cross:1490727525356278064> No Role", description=f"You do not currently have any custom role registered.", color=discord.Color.red())
             await ctx.send(embed=embed, ephemeral=True)
             return
-        
-        # If user has multiple roles, show dropdown
+
         if len(valid_roles) > 1:
             view = RoleSelectView(valid_roles, ctx)
             msg = await ctx.send("Select which role you want to modify:", view=view, ephemeral=True)
@@ -99,7 +98,11 @@ class Roles(commands.Cog):
             selected_role_id = valid_roles[0]
         
         try:
-            role_color = parse_color(color)
+            role_color1 = parse_color(color1)
+            if color2 == None:
+                role_color2 = None
+            else:
+                role_color2 = parse_color(color2)
         except:
             await ctx.send("Invalid hex code.")
             return
@@ -109,8 +112,8 @@ class Roles(commands.Cog):
             await ctx.send('couldnt fetch role')
             return
         
-        await role.edit(color=role_color)
-        embed = discord.Embed(title="<:Check:1490727471761457335> Color Changed", description=f"Succesfully changed role color to `{color}`", color=discord.Color.green())
+        await role.edit(color=role_color1, secondary_color=role_color2)
+        embed = discord.Embed(title="<:Check:1490727471761457335> Color Changed", description=f"Succesfully changed role color.", color=discord.Color.green())
         await ctx.send(embed=embed, ephemeral=True)
 
     @custom.command(name="name", description="Modifys the name of a custom role")          
