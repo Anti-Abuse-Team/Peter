@@ -100,14 +100,16 @@ Example responses:
                 # Split response if too long
                 if len(response) > 2000:
                     chunks = [response[i:i+2000] for i in range(0, len(response), 2000)]
-                    for chunk in chunks:
+                    # Reply to the first chunk, send the rest normally
+                    await message.reply(chunks[0])
+                    for chunk in chunks[1:]:
                         await message.channel.send(chunk)
                 else:
-                    await message.channel.send(response)
+                    await message.reply(response)
 
         except Exception as e:
             print(f"AI Error: {e}")
-            await message.channel.send(f"An error occurred while processing your message.")
+            await message.reply(f"An error occurred while processing your message.")
 
 
 async def setup(bot):
