@@ -19,7 +19,6 @@ class AI(commands.Cog):
 
         self.ai_channel_id = channel_ids["talk-to-peter"]
 
-        # Conversation history per user
         self.conversations = {}
 
     @commands.Cog.listener()
@@ -34,7 +33,6 @@ class AI(commands.Cog):
             return
 
         if not self.client:
-            await rate_limited_send(message.channel, "Groq API key is not configured. Please add GROQ_API_KEY to your .env file.")
             return
 
         try:

@@ -65,6 +65,10 @@ elif Enviroment == "PRODUCTION":
         "unoffical_aat":1264029182183342180
     }
 
+    channel_ids = {
+        "talk-to-peter":1491191282440208514
+    }
+
 
 
 else:
