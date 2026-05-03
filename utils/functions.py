@@ -3,6 +3,7 @@ from colour import Color
 from pymongo import MongoClient
 from dotenv import load_dotenv
 import os
+import asyncio
 
 from discord import ui, ButtonStyle, Colour
 
@@ -58,3 +59,22 @@ def make_container(*components, accent_color: int | Colour = discord.Color.yello
         container.add_item(component)
     view.add_item(container)
     return view
+
+_last_message_time = 0
+_rate_limit_lock = asyncio.Lock()
+RATE_LIMIT_DELAY = 10 
+
+async def rate_limited_send(channel, content=None, **kwargs):
+    global _last_message_time
+    
+    async with _rate_limit_lock:
+        current_time = asyncio.get_event_loop().time()
+        time_since_last = current_time - _last_message_time
+        
+        if time_since_last < RATE_LIMIT_DELAY and _last_message_time != 0:
+            wait_time = RATE_LIMIT_DELAY - time_since_last
+            await asyncio.sleep(wait_time)
+        
+        message = await channel.send(content, **kwargs)
+        _last_message_time = asyncio.get_event_loop().time()
+        return message
