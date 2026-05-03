@@ -66,7 +66,7 @@ elif Enviroment == "PRODUCTION":
     }
 
     channel_ids = {
-        "talk-to-peter":1491191282440208514
+        "talk-to-peter":1264403694615793746
     }
 
 
