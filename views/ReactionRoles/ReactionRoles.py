@@ -9,7 +9,8 @@ class PingDropdown(ui.Select):
             discord.SelectOption(label="Dead Chat Ping", value=1291869585867276308, emoji="<:Dead:1492362975170924615>"),
             discord.SelectOption(label="Question of the Day Ping", value=1293767506691096636, emoji="<:Question:1492362973023309835>"),
             discord.SelectOption(label="Giveaway Ping", value=1355230077503410288, emoji="<:Giveaway:1492362970959712357>"),
-            discord.SelectOption(label="Witch Hunter Ping", value=1322890862551629897, emoji="<:Witch:1492362969177133167>")
+            discord.SelectOption(label="Witch Hunter Ping", value=1322890862551629897, emoji="<:Witch:1492362969177133167>"),
+            discord.SelectOption(label="Games Ping", value=1514759058480169070)
         ]
 
         super().__init__(
@@ -43,7 +44,7 @@ class PingReactionRoles(ui.LayoutView):
         container = ui.Container(
             ui.TextDisplay("### Ping Roles"),
             ui.Separator(),
-            ui.TextDisplay("These are the following roles you can get pings for;\n> <:Abusing:1492366314361065512>  |  Abuse Ping\n> <:Announcement:1492362977410547812>  |  Dead Chat Ping\n> <:Dead:1492362975170924615>  | Question of The Day Ping\n> <:Question:1492362973023309835>  |  Giveaway Ping\n> <:Giveaway:1492362970959712357>  |  Announcements Ping\n> <:Witch:1492362969177133167>  |  Witch Hunter Ping\n"),
+            ui.TextDisplay("These are the following roles you can get pings for;\n> <:Abusing:1492366314361065512>  |  Abuse Ping\n> <:Announcement:1492362977410547812>  |  Dead Chat Ping\n> <:Dead:1492362975170924615>  | Question of The Day Ping\n> <:Question:1492362973023309835>  |  Giveaway Ping\n> <:Giveaway:1492362970959712357>  |  Announcements Ping\n> <:Witch:1492362969177133167>  |  Witch Hunter Ping\n>   |  Games Ping\n"),
             ui.Separator()
         )
 
