@@ -10,7 +10,7 @@ class PingDropdown(ui.Select):
             discord.SelectOption(label="Question of the Day Ping", value=1293767506691096636, emoji="<:Question:1492362973023309835>"),
             discord.SelectOption(label="Giveaway Ping", value=1355230077503410288, emoji="<:Giveaway:1492362970959712357>"),
             discord.SelectOption(label="Witch Hunter Ping", value=1322890862551629897, emoji="<:Witch:1492362969177133167>"),
-            discord.SelectOption(label="Games Ping", value=1514759058480169070, emoji="<:Games:1514759058480169070>")
+            discord.SelectOption(label="Games Ping", value=1514759058480169070, emoji="<:Games:1520834593304084580>")
         ]
 
         super().__init__(
