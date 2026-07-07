@@ -96,7 +96,7 @@ class Purge(commands.Cog):
         await ctx.send(embed=embed, ephemeral=True)
 
         # Also log to a purge log channel if it exists
-        log_channel_id = 1492638575928414279  # same log channel used by crashes
+        log_channel_id = 1124451070891016353  # same log channel used by crashes
         log_channel = ctx.guild.get_channel(log_channel_id)
         if log_channel:
             log_embed = discord.Embed(
