@@ -15,7 +15,7 @@ class PingDropdown(ui.Select):
 
         super().__init__(
             placeholder="Choose an option...",
-            min_values=1,
+            min_values=0,
             max_values=1,
             options=options
         )
@@ -35,6 +35,8 @@ class PingDropdown(ui.Select):
         else:
             await interaction.user.add_roles(role)
             await interaction.followup.send(f"Added role **{role.name}**", ephemeral=True)
+        
+        self.values.clear()
 
 
 class PingReactionRoles(ui.LayoutView):
@@ -72,7 +74,7 @@ class ColorDropdown(ui.Select):
 
         super().__init__(
             placeholder="Choose an option...",
-            min_values=1,
+            min_values=0,
             max_values=1,
             options=options
         )
@@ -92,7 +94,8 @@ class ColorDropdown(ui.Select):
         else:
             await interaction.user.add_roles(role)
             await interaction.followup.send(f"Added role **{role.name}**", ephemeral=True)
-        
+
+        self.values.clear()
         
 
 class ColorReactionRoles(ui.LayoutView):
@@ -122,7 +125,7 @@ class LeaveDropdown(ui.Select):
 
         super().__init__(
             placeholder="Choose an option...",
-            min_values=1,
+            min_values=0,
             max_values=1,
             options=options
         )
@@ -142,6 +145,8 @@ class LeaveDropdown(ui.Select):
         else:
             await interaction.user.add_roles(role)
             await interaction.followup.send(f"Added role **{role.name}**", ephemeral=True)
+            
+        self.values.clear()
 
 class LeaveReactionRoles(ui.LayoutView):
     def __init__(self):
