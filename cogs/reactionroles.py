@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 
 from utils.variables import admin
-from views.ReactionRoles.ReactionRoles import PingReactionRoles, ColorReactionRoles, LeaveReactionRoles
+from views.ReactionRoles.ReactionRoles import PingReactionRoles, ColorReactionRoles, LeaveReactionRoles, LocationReactionRoles
 
 class ReactionRoles(commands.Cog):
     def __init__(self, bot):
@@ -21,6 +21,8 @@ class ReactionRoles(commands.Cog):
                 view = LeaveReactionRoles()
                 await ctx.send(view=view)
                 view = ColorReactionRoles()
+                await ctx.send(view=view)
+                view = LocationReactionRoles()
                 await ctx.send(view=view)
             except Exception as E:
                 await ctx.send(E)
