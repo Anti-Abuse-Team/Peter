@@ -7,7 +7,7 @@ from colorama import Fore
 from dotenv import load_dotenv
 import jishaku
 
-from views.ReactionRoles.ReactionRoles import PingReactionRoles, ColorReactionRoles, LeaveReactionRoles
+from views.ReactionRoles.ReactionRoles import PingReactionRoles, ColorReactionRoles, LeaveReactionRoles, LocationReactionRoles
 
 
 load_dotenv()
@@ -31,11 +31,18 @@ async def on_ready():
     ping_roles = await channel.fetch_message(1492586341127421982)
     color_roles = await channel.fetch_message(1492586343929221272)
     leave_roles = await channel.fetch_message(1492586343052873950)
+    # location_roles = await channel.fetch_message(0)
+
     await ping_roles.edit(view=PingReactionRoles())
     print(f"{Fore.YELLOW}[!]{Fore.RESET} Loaded ping reaction roles.")
+
     await color_roles.edit(view=ColorReactionRoles())
     print(f"{Fore.YELLOW}[!]{Fore.RESET} Loaded color reaction roles.")
+    
     await leave_roles.edit(view=LeaveReactionRoles())
+    print(f"{Fore.YELLOW}[!]{Fore.RESET} Loaded leave reaction roles.")
+
+    # await leave_roles.edit(view=LeaveReactionRoles())
     print(f"{Fore.YELLOW}[!]{Fore.RESET} Loaded leave reaction roles.")
 
 async def load_cogs():
