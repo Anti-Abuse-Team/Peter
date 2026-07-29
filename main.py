@@ -43,7 +43,7 @@ async def on_ready():
     print(f"{Fore.YELLOW}[!]{Fore.RESET} Loaded leave reaction roles.")
 
     await location_roles.edit(view=LocationReactionRoles())
-    print(f"{Fore.YELLOW}[!]{Fore.RESET} Loaded leave reaction roles.")
+    print(f"{Fore.YELLOW}[!]{Fore.RESET} Loaded region reaction roles.")
 
 async def load_cogs():
     for filename in os.listdir("./cogs"):

@@ -210,7 +210,7 @@ class LocationReactionRoles(ui.LayoutView):
         container = ui.Container(
             ui.TextDisplay("### Region Roles"),
             ui.Separator(),
-            ui.TextDisplay("These are the following roles you can choose for your region;\n> <:Globe:1532116844213964902>  |  North America\n> <:Globe:1532116844213964902>  |  South America\n> <:Globe:1532116844213964902>  |  Europe\n> <:Globe:1532116844213964902>  |  Asia\n> <:Globe:1532116844213964902>  |  Africa\n> <:Globe:1532116844213964902>  | Oceania\n> <:Globe:1532116844213964902>  |  Antarctica"),
+            ui.TextDisplay("These are the following roles you can choose for your region;\n> <:Globe:1532116844213964902>  |  North America\n> <:Globe:1532116844213964902>  |  South America\n> <:Globe:1532116844213964902>  |  Europe\n> <:Globe:1532116844213964902>  |  Asia\n> <:Globe:1532116844213964902>  |  Africa\n> <:Globe:1532116844213964902>  |  Oceania\n> <:Globe:1532116844213964902>  |  Antarctica"),
             ui.Separator()
         )
 
