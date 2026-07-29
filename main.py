@@ -42,7 +42,7 @@ async def on_ready():
     await leave_roles.edit(view=LeaveReactionRoles())
     print(f"{Fore.YELLOW}[!]{Fore.RESET} Loaded leave reaction roles.")
 
-    await leave_roles.edit(view=LeaveReactionRoles())
+    await location_roles.edit(view=LeaveReactionRoles())
     print(f"{Fore.YELLOW}[!]{Fore.RESET} Loaded leave reaction roles.")
 
 async def load_cogs():
