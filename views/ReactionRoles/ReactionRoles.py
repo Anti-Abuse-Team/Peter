@@ -164,3 +164,58 @@ class LeaveReactionRoles(ui.LayoutView):
         container.add_item(row)
 
         self.add_item(container)
+
+class LocationDropdown(ui.Select):
+    def __init__(self):
+        options = [
+            discord.SelectOption(label="North America", value=1532078999361159259, emoji="<:Globe:1532116844213964902>"),
+            discord.SelectOption(label="South America", value=1532079042357100554, emoji="<:Globe:1532116844213964902>"),
+            discord.SelectOption(label="Europe", value=1532079093439533217, emoji="<:Globe:1532116844213964902>"),
+            discord.SelectOption(label="Asia", value=1532079134921064678, emoji="<:Globe:1532116844213964902>"),
+            discord.SelectOption(label="Africa", value=1532079170644086884, emoji="<:Globe:1532116844213964902>"),
+            discord.SelectOption(label="Oceania", value=1532079399233519687, emoji="<:Globe:1532116844213964902>"),
+            discord.SelectOption(label="Antarctica", value=1532080593465245698, emoji="<:Globe:1532116844213964902>"),
+
+        ]
+
+        super().__init__(
+            placeholder="Choose an option...",
+            min_values=0,
+            max_values=1,
+            options=options
+        )
+
+    async def callback(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
+        id = self.values[0]
+
+        role = interaction.guild.get_role(int(id))
+        if role is None:
+            await interaction.followup.send("Failed to locate role.", ephemeral=True)
+            return
+
+        if role in interaction.user.roles:
+            await interaction.user.remove_roles(role)
+            await interaction.followup.send(f"Removed role **{role.name}**", ephemeral=True)
+        else:
+            await interaction.user.add_roles(role)
+            await interaction.followup.send(f"Added role **{role.name}**", ephemeral=True)
+            
+        self.values.clear()
+
+class LocationReactionRoles(ui.LayoutView):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+        container = ui.Container(
+            ui.TextDisplay("### Region Roles"),
+            ui.Separator(),
+            ui.TextDisplay("These are the following roles you can choose for your region;\n> <:Globe:1532116844213964902>  |  North America\n> <:Globe:1532116844213964902>  |  South America\n> <:Globe:1532116844213964902>  |  Europe\n> <:Globe:1532116844213964902>  |  Asia\n> <:Globe:1532116844213964902>  |  Africa\n><:Globe:1532116844213964902>  | Oceania\n> <:Globe:1532116844213964902>  |  Antarctica"),
+            ui.Separator()
+        )
+
+        container.accent_color = 0x00e586
+        row = ui.ActionRow(LocationDropdown())
+        container.add_item(row)
+
+        self.add_item(container)
