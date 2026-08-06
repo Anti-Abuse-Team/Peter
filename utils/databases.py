@@ -11,6 +11,8 @@ load_dotenv()
 mongodb = MongoClient(os.getenv("MONGODB_URL"))
 db = mongodb["AAT"]
 roles_db = db["roles"]
+notes_db = db["notes"]
+warns_db = db["warns"]
 
 client = motor.motor_asyncio.AsyncIOMotorClient(
     os.getenv("MONGODB_URL"),
