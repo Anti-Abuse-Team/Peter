@@ -481,6 +481,134 @@ class AATRanks(commands.Cog):
             return await ctx.send("You do not have permission to use this command.", ephemeral=True)
         await self.remove_role(ctx, user, "under_review", "Under Review")
 
+    # ============================================================
+    # NOTES / WARNS COMMANDS
+    # ============================================================
+
+    def is_staff(self, ctx) -> bool:
+        """Check if user has AAT staff, deputy, or development role"""
+        return any(r.id in admin for r in ctx.author.roles) or ctx.author.guild_permissions.administrator
+
+    @commands.hybrid_command(name="mynotes", description="View your notes")
+    async def mynotes(self, ctx: commands.Context):
+        """View your notes from the database"""
+        from utils.databases import notes_db
+
+        info = notes_db.find_one({"user_id": ctx.author.id})
+        if not info or not info.get("notes"):
+            embed = discord.Embed(
+                title="<:Cross:1490727525356278064> No Notes",
+                description="You don't have any notes.",
+                color=discord.Color.red()
+            )
+            return await ctx.send(embed=embed, ephemeral=True)
+
+        notes = info["notes"]
+        embed = discord.Embed(
+            title="📝 Your Notes",
+            description=f"**User:** {ctx.author.mention} (`{ctx.author.id}`)\n**Total Notes:** {len(notes)}",
+            color=discord.Color.blue()
+        )
+        for i, note in enumerate(notes, 1):
+            embed.add_field(
+                name=f"Note #{i}",
+                value=f"**Note:** {note.get('note', 'N/A')}\n**By:** <@{note.get('moderator_id', 0)}>\n**Time:** {note.get('timestamp', 'N/A')}",
+                inline=False
+            )
+        await ctx.send(embed=embed, ephemeral=True)
+
+    @commands.hybrid_command(name="mywarns", description="View your warnings")
+    async def mywarns(self, ctx: commands.Context):
+        """View your warnings from the database"""
+        from utils.databases import warns_db
+
+        info = warns_db.find_one({"user_id": ctx.author.id})
+        if not info or not info.get("warns"):
+            embed = discord.Embed(
+                title="<:Cross:1490727525356278064> No Warnings",
+                description="You don't have any warnings.",
+                color=discord.Color.red()
+            )
+            return await ctx.send(embed=embed, ephemeral=True)
+
+        warns = info["warns"]
+        embed = discord.Embed(
+            title="⚠️ Your Warnings",
+            description=f"**User:** {ctx.author.mention} (`{ctx.author.id}`)\n**Total Warnings:** {len(warns)}",
+            color=discord.Color.orange()
+        )
+        for i, warn in enumerate(warns, 1):
+            embed.add_field(
+                name=f"Warning #{i}",
+                value=f"**Reason:** {warn.get('reason', 'N/A')}\n**By:** <@{warn.get('moderator_id', 0)}>\n**Time:** {warn.get('timestamp', 'N/A')}",
+                inline=False
+            )
+        await ctx.send(embed=embed, ephemeral=True)
+
+    @commands.hybrid_command(name="warn", description="Warns a user (AAT Staff only)")
+    async def warn(self, ctx: commands.Context, user: discord.Member, *, reason: str):
+        """Adds a warning to a user in the database"""
+        if not self.is_staff(ctx):
+            return await ctx.send("You do not have permission to use this command.", ephemeral=True)
+
+        from utils.databases import warns_db
+        from datetime import datetime
+        import pytz
+
+        tz = pytz.timezone("US/Eastern")
+        timestamp = datetime.now(tz).strftime("%m/%d/%y %I:%M %p")
+
+        info = warns_db.find_one({"user_id": user.id})
+        warn_data = {
+            "reason": reason,
+            "moderator_id": ctx.author.id,
+            "timestamp": timestamp
+        }
+
+        if info:
+            warns_db.update_one({"user_id": user.id}, {"$push": {"warns": warn_data}})
+        else:
+            warns_db.insert_one({"user_id": user.id, "warns": [warn_data]})
+
+        embed = discord.Embed(
+            title="<:Check:1490727471761457335> User Warned",
+            description=f"**User:** {user.mention} (`{user.id}`)\n**Reason:** {reason}\n**Warned by:** {ctx.author.mention}\n**Time:** {timestamp}",
+            color=discord.Color.orange()
+        )
+        await ctx.send(embed=embed)
+
+    @commands.hybrid_command(name="note", description="Adds a note to a user (AAT Staff only)")
+    async def note(self, ctx: commands.Context, user: discord.Member, *, note_text: str):
+        """Adds a note to a user in the database"""
+        if not self.is_staff(ctx):
+            return await ctx.send("You do not have permission to use this command.", ephemeral=True)
+
+        from utils.databases import notes_db
+        from datetime import datetime
+        import pytz
+
+        tz = pytz.timezone("US/Eastern")
+        timestamp = datetime.now(tz).strftime("%m/%d/%y %I:%M %p")
+
+        info = notes_db.find_one({"user_id": user.id})
+        note_data = {
+            "note": note_text,
+            "moderator_id": ctx.author.id,
+            "timestamp": timestamp
+        }
+
+        if info:
+            notes_db.update_one({"user_id": user.id}, {"$push": {"notes": note_data}})
+        else:
+            notes_db.insert_one({"user_id": user.id, "notes": [note_data]})
+
+        embed = discord.Embed(
+            title="<:Check:1490727471761457335> Note Added",
+            description=f"**User:** {user.mention} (`{user.id}`)\n**Note:** {note_text}\n**Added by:** {ctx.author.mention}\n**Time:** {timestamp}",
+            color=discord.Color.blue()
+        )
+        await ctx.send(embed=embed)
+
 
 async def setup(bot):
     await bot.add_cog(AATRanks(bot))
